@@ -4,7 +4,10 @@
 
 ## Welcome! 👋
 
-Thanks for checking out this front-end coding challenge.
+I JUST TOOK THE WHOLE IDEA FROM FRONTEND MENTOR, I'M NOT REMOVING ALL OF THIS README CONTENT
+IN CASE YOU NEED IT TO LEARN HOW TO CREATE A README, AND BECAUSE I DON'T THINK I CAN REALLY
+IMPROVE IT, BUT MAYBE IN THE FUTURE I'LL BE CREATIVE AND MOTIVATED ENOUGH TO PLACE SOME ART
+OVER THIS.
 
 [Frontend Mentor](https://www.frontendmentor.io) challenges help you improve your coding skills by building realistic projects.
 
