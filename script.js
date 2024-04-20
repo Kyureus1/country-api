@@ -60,11 +60,7 @@ function countrySelection(nativeName, population, region, subRegion, capital, to
 
 async function main() {
    await pageBuild();
-   await getFlags();
-   await getNames();
-   await getPopulation();
-   await getRegion();
-   await getCapital();
+   await getContent();
 }
 
 async function back() {
@@ -265,74 +261,29 @@ async function pageBuild() {
                         });
 }
 
-async function getFlags() {
-   fetch(`${API_URL}/all?fields=flags`).then((response) => response.json())
-                                       .then((flags) => {
-                                          const flagImg = document.getElementsByClassName("flagImg"); 
-                                          for (let i = 0; i<flags.length; i++) {
-                                             flagImg[i].setAttribute("src",`${flags[i].flags.svg}`);
-                                          }
-                                       })
-                                       .catch((e) => {
-                                          console.log(e);
-                                       });
-}
-
-async function getNames() {
-   fetch(`${API_URL}/all?fields=name`).then((response) => response.json())
-                                       .then((names) => {
-                                          const countName = document.getElementsByClassName("countName");
-                                          for (let i = 0; i<names.length; i++) {
-                                             countName[i].innerText = `${names[i].name.common}`;
-                                          }
-                                       })
-                                       .catch((e) => {
-                                          console.log(e);
-                                       });  
-}
-
-async function getPopulation() {
-   fetch(`${API_URL}/all?fields=population`).then((response) => response.json())
-                                          .then((populations) => {
-                                             const countPop = document.getElementsByClassName("countPop");
-                                             for (let i = 0; i<populations.length; i++) {
-                                                countPop[i].innerText = "Population: " + `${populations[i].population}`;
-                                             }
-                                          })
-                                          .catch((e) => {
-                                             console.log(e);
-                                          });
-}
-
-async function getRegion() {
-   fetch(`${API_URL}/all?fields=region`).then((response) => response.json())
-                                       .then((regions) => {
-                                          const countRegion = document.getElementsByClassName("countRegion");
-                                          for (let i = 0; i<regions.length; i++) {
-                                             countRegion[i].innerText = "Region: " + `${regions[i].region}`;
-                                          }
-                                       })
-                                       .catch((e) => {
-                                          console.log(e);
-                                       });
-}
-
-async function getCapital() {
-   fetch(`${API_URL}/all?fields=capital`).then((response) => response.json())
-                                       .then((capitals) => {
-                                          const countCap = document.getElementsByClassName("countCap");
-                                          for (let i = 0; i<capitals.length; i++) {
-                                             if(capitals[i].capital.length > 0) {
-                                                countCap[i].innerText = "capital: " + `${capitals[i].capital}`+' ';
-                                             }
-                                             else {
-                                                countCap[i].innerText = "capital: " + "unknown";
-                                             }
-                                          }
-                                       })
-                                       .catch((e) => {
-                                          console.log(e);
-                                       });
+async function getContent() {
+   const getContent = await fetch(`${API_URL}/all?fields=flags,name,population,region,capital`);
+   const parseContent = await getContent.json();
+   let i = 0;
+   const countName = document.getElementsByClassName("countName");
+   const flagImg = document.getElementsByClassName("flagImg");
+   const countPop = document.getElementsByClassName("countPop");
+   const countRegion = document.getElementsByClassName("countRegion");
+   const countCap = document.getElementsByClassName("countCap");
+   parseContent.forEach(element => {
+      console.log(element.flags); 
+      flagImg[i].setAttribute("src",`${element.flags.svg}`);
+      countName[i].innerText = `${element.name.common}`;
+      countPop[i].innerText = "Population: " + `${element.population}`;
+      countRegion[i].innerText = "Region: " + `${element.region}`;
+      if(element.capital.length > 0) {
+         countCap[i].innerText = "capital: " + `${element.capital}`+' ';                                        
+      }
+      else {
+         countCap[i].innerText = "capital: " + "unknown";
+      }
+      i++;
+   });
 }
 main();
 
