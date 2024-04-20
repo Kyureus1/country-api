@@ -273,6 +273,7 @@ async function getContent() {
    parseContent.forEach(element => {
       console.log(element.flags); 
       flagImg[i].setAttribute("src",`${element.flags.svg}`);
+      flagImg[i].setAttribute("alt",`${element.name.common}` + "-flag");
       countName[i].innerText = `${element.name.common}`;
       countPop[i].innerText = "Population: " + `${element.population}`;
       countRegion[i].innerText = "Region: " + `${element.region}`;
@@ -285,6 +286,7 @@ async function getContent() {
       i++;
    });
 }
+
 main();
 
 
