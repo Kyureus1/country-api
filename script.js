@@ -47,7 +47,7 @@ dropdownButton.addEventListener("click", () => {
    }
 });
 
-function countrySelection(nativeName, population, region, subRegion, capital, topLevel, currencies, languages) {
+function countrySelection(nativeName, population, region, subRegion, capital, topLevel, currencies, languages, borders) {
    this.nativeName = nativeName;
    this.population = population;
    this.region = region;
@@ -56,6 +56,7 @@ function countrySelection(nativeName, population, region, subRegion, capital, to
    this.topLevel = topLevel;
    this.currencies = currencies;
    this.languages = languages;
+   this.borders = borders;
 }
 
 async function main() {
@@ -64,214 +65,298 @@ async function main() {
 }
 
 async function back() {
-   main();
+   await main();
+}
+
+async function fillFlagInfo(event) {
+   const buttonDiv = document.createElement("div");
+   const backButton = document.createElement("button");
+   const mainBox = document.createElement("div");
+   const imgDiv = document.createElement("div");
+   const textDiv = document.createElement("div");
+   const related = document.createElement("div");
+   const infoDiv = document.createElement('div');
+   const countName = document.createElement('h2');
+   const image = document.createElement('img');
+   const innerText1 = document.createElement('div');
+   const innerText2 = document.createElement('div');
+   buttonDiv.setAttribute('id', 'buttonDiv');
+   backButton.setAttribute('id', 'backButton');
+   backButton.setAttribute('cursor', 'custom');
+   backButton.addEventListener('click', back);
+   backButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg><p>Back</p>`;
+   mainBox.setAttribute('id', 'mainBox');
+   imgDiv.setAttribute('id', 'imgDiv');
+   textDiv.setAttribute('id', 'textDiv');
+   related.setAttribute('id', 'related');
+   countName.setAttribute('id', 'countName');
+   infoDiv.setAttribute('id', 'infoDiv');
+   innerText1.setAttribute('id', 'innerText1');
+   innerText2.setAttribute('id', 'innerText2');
+   const API = await fetch(`${API_URL}/all?fields=name,flags,population,region,subregion,capital,languages,currencies,tld,borders`);
+   const parseAPI = await API.json();
+   const countIndex = document.getElementsByClassName("country");
+   for (const iterator of countIndex) {
+      if(iterator.contains(event.target)) {
+         parseAPI.forEach(element => {
+            if(event.target.parentElement.id == element.name.common) {
+               contBox.innerHTML = "";
+               
+               document.getElementById("main-menu").style.display = "none";
+               buttonDiv.appendChild(backButton);
+               countName.innerHTML = element.name.common;
+               textDiv.append(countName, infoDiv, related);
+               image.setAttribute('src', `${element.flags.svg}`);
+               imgDiv.appendChild(image);
+               mainBox.append(imgDiv, textDiv);
+               contBox.append(buttonDiv, mainBox);
+               const country = new countrySelection();
+               country.population = element.population;
+               country.region = element.region;
+               country.subRegion = element.subregion;
+
+               let temp2 = [];
+               let tString = "";
+               temp2 = Object.values(element.tld);
+               for(j = 0; j < temp2.length; j++) {
+                  temp2[j] = temp2[j].toString();
+                  tString += temp2[j] + ", ";
+               }
+               tString = tString.substring(0, tString.length - 2);
+               country.topLevel = tString;
+
+
+               temp2 = [];
+               tString = "";
+               temp2 = Object.values(element.name.nativeName);
+               for(j = 0; j < temp2.length; j++) {
+                  temp2[j] = temp2[j].official.toString();
+                  tString += temp2[j] + ", ";
+               }
+               tString = tString.substring(0, tString.length - 2);
+               country.nativeName = tString;
+
+
+               temp2 = [];
+               tString = "";
+               temp2 = Object.values(element.capital);
+               for(j = 0; j < temp2.length; j++) {
+                  temp2[j] = temp2[j].toString();
+                  tString += temp2[j] + ", ";
+               }
+               tString = tString.substring(0, tString.length - 2);
+               country.capital = tString;
+
+
+               temp2 = [];
+               tString = "";
+               temp2 = Object.values(element.currencies);
+               for(j = 0; j < temp2.length; j++) {
+                  temp2[j] = temp2[j].name.toString();
+               }
+               for(t = 0; t < temp2.length; t++) {
+                  tString += temp2[t] + ", ";
+               }
+               tString = tString.substring(0, tString.length - 2);
+               country.currencies = tString;
+
+
+               temp2 = [];
+               tString = "";
+               temp2 = Object.values(element.languages);
+               for(j = 0; j < temp2.length; j++) {
+                  temp2[j] = temp2[j].toString();
+               }
+               for(t = 0; t < temp2.length; t++) {
+                  tString += temp2[t] + ", ";
+               }
+               tString = tString.substring(0, tString.length - 2);
+               country.languages = tString;
+
+               if(element.borders.length != 0) {
+                  related.append(document.createElement("p").innerText = "Borders: ");
+                  element.borders.forEach(el => {
+                     let buttonCreate = document.createElement('button');
+                     buttonCreate.setAttribute('class', 'borderButtons');
+                     buttonCreate.innerText = el;
+                     buttonCreate.addEventListener('click', async() => {
+                        const API = await fetch(`${API_URL}/all?fields=cca3,name,flags,population,region,subregion,capital,languages,currencies,tld,borders`);
+                        const parseAPI = await API.json();
+                        parseAPI.forEach(element => {
+                           if(element.cca3 == buttonCreate.innerText) {
+                              const country = new countrySelection();
+                              countName.innerHTML = element.name.common;
+                              country.population = element.population;
+                              country.region = element.region;
+                              country.subRegion = element.subregion;
+
+                              let temp2 = [];
+                              let tString = "";
+                              temp2 = Object.values(element.tld);
+                              for(j = 0; j < temp2.length; j++) {
+                                 temp2[j] = temp2[j].toString();
+                                 tString += temp2[j] + ", ";
+                              }
+                              tString = tString.substring(0, tString.length - 2);
+                              country.topLevel = tString;
+
+
+                              temp2 = [];
+                              tString = "";
+                              temp2 = Object.values(element.name.nativeName);
+                              for(j = 0; j < temp2.length; j++) {
+                                 temp2[j] = temp2[j].official.toString();
+                                 tString += temp2[j] + ", ";
+                              }
+                              tString = tString.substring(0, tString.length - 2);
+                              country.nativeName = tString;
+
+
+                              temp2 = [];
+                              tString = "";
+                              temp2 = Object.values(element.capital);
+                              for(j = 0; j < temp2.length; j++) {
+                                 temp2[j] = temp2[j].toString();
+                                 tString += temp2[j] + ", ";
+                              }
+                              tString = tString.substring(0, tString.length - 2);
+                              country.capital = tString;
+
+
+                              temp2 = [];
+                              tString = "";
+                              temp2 = Object.values(element.currencies);
+                              for(j = 0; j < temp2.length; j++) {
+                                 temp2[j] = temp2[j].name.toString();
+                              }
+                              for(t = 0; t < temp2.length; t++) {
+                                 tString += temp2[t] + ", ";
+                              }
+                              tString = tString.substring(0, tString.length - 2);
+                              country.currencies = tString;
+
+
+                              temp2 = [];
+                              tString = "";
+                              temp2 = Object.values(element.languages);
+                              for(j = 0; j < temp2.length; j++) {
+                                 temp2[j] = temp2[j].toString();
+                              }
+                              for(t = 0; t < temp2.length; t++) {
+                                 tString += temp2[t] + ", ";
+                              }
+                              tString = tString.substring(0, tString.length - 2);
+                              country.languages = tString;
+                              image.setAttribute('src', `${element.flags.svg}`);
+                              const capital = document.getElementById("capital");
+                              const currencies = document.getElementById("currencies");
+                              const languages = document.getElementById("languages");
+                              const nativeName = document.getElementById("nativename");
+                              const population = document.getElementById("population");
+                              const region = document.getElementById("region");
+                              const subRegion = document.getElementById("subregion");
+                              const topLevel = document.getElementById("toplevel");
+                              capital.innerText = `Capital: ${country.capital}`
+                              currencies.innerText = `Currencies: ${country.currencies}`
+                              languages.innerText = `languages: ${country.languages}`
+                              nativeName.innerText = `Native Names: ${country.nativeName}`
+                              population.innerText = `Population: ${country.population}`
+                              region.innerText = `Region: ${country.region}`
+                              subRegion.innerText = `Sub Region: ${country.subRegion}`
+                              topLevel.innerText = `Top Level Domain: ${country.topLevel}`
+                           }
+                        });
+                     });
+                     related.append(buttonCreate);
+                  });
+               }
+               else {
+                  related.append(document.createElement("p").innerText = "Borders: none");
+               }
+
+               const capital = document.createElement('p');
+               const currencies = document.createElement('p');
+               const languages = document.createElement('p');
+               const nativeName = document.createElement('p');
+               const population = document.createElement('p');
+               const region = document.createElement('p');
+               const subRegion = document.createElement('p');
+               const topLevel = document.createElement('p');
+               capital.setAttribute('class', 'countryInfo');
+               currencies.setAttribute('class', 'countryInfo');
+               languages.setAttribute('class', 'countryInfo');
+               nativeName.setAttribute('class', 'countryInfo');
+               population.setAttribute('class', 'countryInfo');
+               region.setAttribute('class', 'countryInfo');
+               subRegion.setAttribute('class', 'countryInfo');
+               topLevel.setAttribute('class', 'countryInfo');
+               
+               capital.setAttribute('id', 'capital');
+               currencies.setAttribute('id', 'currencies');
+               languages.setAttribute('id', 'languages');
+               nativeName.setAttribute('id', 'nativename');
+               population.setAttribute('id', 'population');
+               region.setAttribute('id', 'region');
+               subRegion.setAttribute('id', 'subregion');
+               topLevel.setAttribute('id', 'toplevel');
+               capital.innerText = `Capital: ${country.capital}`
+               currencies.innerText = `Currencies: ${country.currencies}`
+               languages.innerText = `languages: ${country.languages}`
+               nativeName.innerText = `Native Names: ${country.nativeName}`
+               population.innerText = `Population: ${country.population}`
+               region.innerText = `Region: ${country.region}`
+               subRegion.innerText = `Sub Region: ${country.subRegion}`
+               topLevel.innerText = `Top Level Domain: ${country.topLevel}`
+               innerText1.append(nativeName, population, region, subRegion, capital);
+               innerText2.append(topLevel, currencies, languages);
+               infoDiv.append(innerText1, innerText2);
+            }
+         });
+      }
+   }
+}
+
+async function create(event) {
+   await fillFlagInfo(event);
 }
 
 async function pageBuild() {
    document.getElementById("main-menu").style.display = "flex";
+   document.querySelector("#depButton p").innerText = "Filter by Region";
    contBox.innerHTML = "";
-   fetch(`${API_URL}/all?fields=name`).then((response) => response.json())
-                        .then((all) => {
-                           all.forEach(element => {
-                              const flagDiv = document.createElement("div");
-                              const flagImg = document.createElement("img");
-                              const countName = document.createElement("p");
-                              const countPop = document.createElement("p");
-                              const countRegion = document.createElement("p");
-                              const countCap = document.createElement("p");
-                              flagDiv.setAttribute("class", "country");
-                              flagDiv.addEventListener('click', async(event) => {
-                                 fetch(`${API_URL}/all`).then((response) => response.json())
-                                                            .then((all) => {
-                                                               let temp = [];
-                                                               const countIndex = document.getElementsByClassName("country");
-                                                               const buttonDiv = document.createElement("div");
-                                                               const backButton = document.createElement("button");
-                                                               const mainBox = document.createElement("div");
-                                                               const imgDiv = document.createElement("div");
-                                                               const textDiv = document.createElement("div");
-                                                               const related = document.createElement("div");
-                                                               const infoDiv = document.createElement('div');
-                                                               const relatedButton = document.createElement("button");
-                                                               const countName = document.createElement('h2');
-                                                               const image = document.createElement('img');
-                                                               const innerText1 = document.createElement('div');
-                                                               const innerText2 = document.createElement('div');
-                                                               buttonDiv.setAttribute('id', 'buttonDiv');
-                                                               backButton.setAttribute('id', 'backButton');
-                                                               backButton.setAttribute('cursor', 'custom');
-                                                               backButton.addEventListener('click', back);
-                                                               backButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg><p>Back</p>`;
-                                                               mainBox.setAttribute('id', 'mainBox');
-                                                               imgDiv.setAttribute('id', 'imgDiv');
-                                                               textDiv.setAttribute('id', 'textDiv');
-                                                               related.setAttribute('id', 'related');
-                                                               relatedButton.setAttribute('class', 'relatedButton');
-                                                               countName.setAttribute('id', 'countName');
-                                                               infoDiv.setAttribute('id', 'infoDiv');
-                                                               innerText1.setAttribute('id', 'innerText1');
-                                                               innerText2.setAttribute('id', 'innerText2');
-                                                               for (const iterator of countIndex) {
-                                                                  temp.push(iterator);
-                                                               }
-                                                               for (let i = 0; i < temp.length; i++) {
-                                                                  /* console.log(all[i]); */
-                                                                  if(temp[i].contains(event.target)) {
-                                                                     contBox.innerHTML = "";
-                                                                     document.getElementById("main-menu").style.display = "none";
-                                                                     buttonDiv.appendChild(backButton);
-                                                                     countName.innerHTML = all[i].name.common;
-                                                                     textDiv.append(countName, infoDiv, related);
-                                                                     image.setAttribute('src', `${all[i].flags.svg}`);
-                                                                     imgDiv.appendChild(image);
-                                                                     mainBox.append(imgDiv, textDiv);
-                                                                     contBox.append(buttonDiv, mainBox);
-                                                                     const country = new countrySelection();
+   const API = await fetch(`${API_URL}/all`);
+   const parseAPI = await API.json();
+   parseAPI.forEach(element => {
+      const flagDiv = document.createElement("div");
+      const flagImg = document.createElement("img");
+      const countName = document.createElement("p");
+      const countPop = document.createElement("p");
+      const countRegion = document.createElement("p");
+      const countCap = document.createElement("p");
+      flagDiv.setAttribute("class", "country");
+      flagDiv.setAttribute("id", `${element.name.common}`);
+      flagDiv.addEventListener('click', create);
 
-
-                                                                     /* country.nativeName = all[i].name.nativeName; */
-                                                                     country.population = all[i].population;
-                                                                     country.region = all[i].region;
-                                                                     country.subRegion = all[i].subregion;
-
-                                                                     let temp2 = [];
-                                                                     let tString = "";
-                                                                     if(all[i].tld != undefined) {
-                                                                        temp2 = Object.values(all[i].tld);
-                                                                        for(j = 0; j < temp2.length; j++) {
-                                                                           temp2[j] = temp2[j].toString();
-                                                                           tString += temp2[j] + ", ";
-                                                                        }
-                                                                        tString = tString.substring(0, tString.length - 2);
-                                                                        country.topLevel = tString;
-                                                                     }
-                                                                     else {
-                                                                        country.topLevel = 'unknown';
-                                                                     }
-
-
-                                                                     temp2 = [];
-                                                                     tString = "";
-                                                                     if(all[i].name.nativeName != undefined) {
-                                                                        temp2 = Object.values(all[i].name.nativeName);
-                                                                        for(j = 0; j < temp2.length; j++) {
-                                                                           temp2[j] = temp2[j].official.toString();
-                                                                           tString += temp2[j] + ", ";
-                                                                        }
-                                                                        tString = tString.substring(0, tString.length - 2);
-                                                                        country.nativeName = tString;
-                                                                     }
-                                                                     else {
-                                                                        country.nativeName = 'unknown';
-                                                                     }
-
-
-                                                                     temp2 = [];
-                                                                     tString = "";
-                                                                     if(all[i].capital != undefined) {
-                                                                        temp2 = Object.values(all[i].capital);
-                                                                        for(j = 0; j < temp2.length; j++) {
-                                                                           temp2[j] = temp2[j].toString();
-                                                                           tString += temp2[j] + ", ";
-                                                                        }
-                                                                        tString = tString.substring(0, tString.length - 2);
-                                                                        country.capital = tString;
-                                                                     }
-                                                                     else {
-                                                                        country.capital = 'unknown';
-                                                                     }
-
-
-                                                                     temp2 = [];
-                                                                     tString = "";
-                                                                     if(all[i].currencies != undefined) {
-                                                                        temp2 = Object.values(all[i].currencies);
-                                                                        for(j = 0; j < temp2.length; j++) {
-                                                                           temp2[j] = temp2[j].name.toString();
-                                                                        }
-                                                                        for(t = 0; t < temp2.length; t++) {
-                                                                           tString += temp2[t] + ", ";
-                                                                        }
-                                                                        tString = tString.substring(0, tString.length - 2);
-                                                                        country.currencies = tString;
-                                                                     }
-                                                                     else {
-                                                                        country.languages = "unknown";
-                                                                     }
-
-
-                                                                     temp2 = [];
-                                                                     tString = "";
-                                                                     if(all[i].languages != undefined) {
-                                                                        temp2 = Object.values(all[i].languages);
-                                                                        for(j = 0; j < temp2.length; j++) {
-                                                                           temp2[j] = temp2[j].toString();
-                                                                        }
-                                                                        for(t = 0; t < temp2.length; t++) {
-                                                                           tString += temp2[t] + ", ";
-                                                                        }
-                                                                        tString = tString.substring(0, tString.length - 2);
-                                                                        country.languages = tString;
-                                                                     }
-                                                                     else {
-                                                                        country.languages = "unknown";
-                                                                     }
-                                                                     const capital = document.createElement('p');
-                                                                     const currencies = document.createElement('p');
-                                                                     const languages = document.createElement('p');
-                                                                     const nativeName = document.createElement('p');
-                                                                     const population = document.createElement('p');
-                                                                     const region = document.createElement('p');
-                                                                     const subRegion = document.createElement('p');
-                                                                     const topLevel = document.createElement('p');
-                                                                     capital.setAttribute('class', 'countryInfo');
-                                                                     currencies.setAttribute('class', 'countryInfo');
-                                                                     languages.setAttribute('class', 'countryInfo');
-                                                                     nativeName.setAttribute('class', 'countryInfo');
-                                                                     population.setAttribute('class', 'countryInfo');
-                                                                     region.setAttribute('class', 'countryInfo');
-                                                                     subRegion.setAttribute('class', 'countryInfo');
-                                                                     topLevel.setAttribute('class', 'countryInfo');
-                                                                     capital.innerText = `Capital: ${country.capital}`
-                                                                     currencies.innerText = `Currencies: ${country.currencies}`
-                                                                     languages.innerText = `languages: ${country.languages}`
-                                                                     nativeName.innerText = `Native Names: ${country.nativeName}`
-                                                                     population.innerText = `Population: ${country.population}`
-                                                                     region.innerText = `Region: ${country.region}`
-                                                                     subRegion.innerText = `Sub Region: ${country.subRegion}`
-                                                                     topLevel.innerText = `Top Level Domain: ${country.topLevel}`
-                                                                     innerText1.append(nativeName, population, region, subRegion, capital);
-                                                                     innerText2.append(topLevel, currencies, languages);
-                                                                     infoDiv.append(innerText1, innerText2);
-                                                                  }
-                                                               }
-                                                            });
-                              });
-                              flagImg.setAttribute("class", "flagImg");
-                              countName.setAttribute("class", "countName");
-                              countPop.setAttribute("class", "countPop");
-                              countRegion.setAttribute("class", "countRegion");
-                              countCap.setAttribute("class", "countCap");
-                              flagDiv.append(flagImg, countName, countPop, countRegion, countCap);
-                              contBox.appendChild(flagDiv); 
-                           });
-                        })
-                        .catch((e) => {
-                           console.log(e);
-                        });
+      flagImg.setAttribute("class", "flagImg");
+      countName.setAttribute("class", "countName");
+      countPop.setAttribute("class", "countPop");
+      countRegion.setAttribute("class", "countRegion");
+      countCap.setAttribute("class", "countCap");
+      flagDiv.append(flagImg, countName, countPop, countRegion, countCap);
+      contBox.appendChild(flagDiv); 
+   });
 }
 
 async function getContent() {
    const getContent = await fetch(`${API_URL}/all?fields=flags,name,population,region,capital`);
    const parseContent = await getContent.json();
-   let i = 0;
    const countName = document.getElementsByClassName("countName");
    const flagImg = document.getElementsByClassName("flagImg");
    const countPop = document.getElementsByClassName("countPop");
    const countRegion = document.getElementsByClassName("countRegion");
    const countCap = document.getElementsByClassName("countCap");
+   let i = 0;
    parseContent.forEach(element => {
-      console.log(element.flags); 
       flagImg[i].setAttribute("src",`${element.flags.svg}`);
       flagImg[i].setAttribute("alt",`${element.name.common}` + "-flag");
       countName[i].innerText = `${element.name.common}`;
